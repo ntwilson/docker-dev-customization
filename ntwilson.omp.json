@@ -1,0 +1,135 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 2,
+  "final_space": true,
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "shell",
+          "style": "plain",
+          "foreground": "#60809f",
+          "background": "transparent",
+          "template": " {{ .Name }} ",
+          "properties": {
+            "mapped_shell_names": {
+              "bash": "bash \uf292!",
+              "pwsh": "PS \ue7a2"
+            }
+          }
+        },
+        {
+          "type": "root",
+          "style": "plain",
+          "powerline_symbol": "\ue0b0",
+          "foreground": "red",
+          "template": "\uf0e7 ",
+          "properties": {
+            "root_icon": "\uf0e7"
+          }
+        },
+        {
+          "type": "path",
+          "style": "plain",
+          "foreground": "#0973C0",
+          "template": " {{ .Path }} ",
+          "properties": {
+            "folder_icon": "\uf115",
+            "folder_separator_icon": " \ue0b1 ",
+            "style": "full"
+          }
+        },
+        {
+          "type": "git",
+          "style": "plain",
+          "foreground": "green",
+          "foreground_templates": [
+            "{{ if or (.Working.Changed) (.Staging.Changed) }}yellow{{ end }}",
+            "{{ if and (gt .Ahead 0) (gt .Behind 0) }}red{{ end }}",
+            "{{ if gt .Ahead 0 }}green{{ end }}",
+            "{{ if gt .Behind 0 }}red{{ end }}"
+          ],
+          "template": " on {{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }} \uf044 <red>{{ .Working.String }}</>{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 <yellow>{{ .Staging.String }}</>{{ end }}",
+          "properties": {
+            "fetch_stash_count": false,
+            "fetch_status": true,
+            "fetch_upstream_icon": true,
+            "github_icon": "\uf408 "
+          }
+        },
+        {
+          "type": "dotnet",
+          "style": "plain",
+          "foreground": "#0973C0",
+          "template": "  \ue7a7 {{ if .Unsupported }}\uf071{{ else }}{{ .Full }}{{ end }} "
+        },
+        {
+          "type": "python",
+          "style": "powerline",
+          "foreground": "green",
+          "background": "transparent",
+          "template": "  \ue235 {{ if .Error }}{{ .Error }}{{ else }}{{ if .Venv }}{{ .Venv }} {{ end }}{{ .Full }}{{ end }} "
+        }
+      ],
+      "newline": true
+    },
+    {
+      "type": "prompt",
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "text",
+          "style": "plain",
+          "foreground": "#0CA3D8",
+          "template": " \uf0aa "
+        },
+        {
+          "type": "executiontime",
+          "style": "plain",
+          "foreground": "yellow",
+          "template": " \u23f1 [{{ .FormattedMs }}s]",
+          "properties": {
+            "style": "dallas",
+            "threshold": 0
+          }
+        },
+        {
+          "type": "exit",
+          "style": "plain",
+          "foreground": "#4caf50",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}red{{ end }}"
+          ],
+          "template": " {{ if gt .Code 0 }}\uf525  {{ .Code }}{{ else }}\uf469 {{ end }} ",
+          "properties": {
+            "always_enabled": true,
+            "color_foreground": true,
+            "display_exit_code": true
+          }
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "os",
+          "style": "plain",
+          "foreground": "#dddddd",
+          "background": "transparent",
+          "template": " {{ if .WSL }}WSL at {{ end }}{{.Icon}} "
+        },
+        {
+          "type": "text",
+          "style": "plain",
+          "foreground": "green",
+          "template": "❯"
+        }
+      ],
+      "newline": true
+    }
+  ]
+}
