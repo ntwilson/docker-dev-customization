@@ -15,9 +15,7 @@ RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linu
 
 
 
-# install posh-git & dotenv
-RUN pwsh -c "Install-Module -Name posh-git -Scope CurrentUser -Force" && \
-    pwsh -c "Install-Module -Name pwsh-dotenv -Force"
+    # pwsh -c "Install-Module -Name pwsh-dotenv -Force" && \
 
 RUN git config --global core.editor nvim && \
     git config --global user.name "Nathan Wilson" && \
@@ -30,6 +28,14 @@ RUN curl -s https://ohmyposh.dev/install.sh | bash -s && \
     mkdir -p $HOME/.config/oh-my-posh
 
 COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
+COPY ./Fix-dotenv.ps1 /root/Fix-dotenv.ps1
+
+# install posh-git & dotenv
+RUN pwsh -c "Install-Module -Name posh-git -Scope CurrentUser -Force" && \
+    pwsh -c "Install-Module -Name dotenv -Force" && \
+    dos2unix /root/Fix-dotenv.ps1 && \
+    pwsh -f /root/Fix-dotenv.ps1 && \
+    rm /root/Fix-dotenv.ps1
 
 COPY ./Microsoft.PowerShell_profile.ps1 /root/.config/powershell/Microsoft.PowerShell_profile.ps1
 
