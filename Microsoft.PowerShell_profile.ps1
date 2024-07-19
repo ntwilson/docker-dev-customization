@@ -6,3 +6,11 @@ oh-my-posh --init --shell pwsh --config ~/.config/oh-my-posh/ntwilson.omp.json |
 if (Test-Path .\.env) {
   set-dotenv
 }
+
+$env:MSSQL03_CONN = cat /git/secrets/MSSQL03_CONN
+$env:MSSQL03_USER = cat /git/secrets/MSSQL03_USER
+$env:MSSQL03_PASSWORD = cat /git/secrets/MSSQL03_PASSWORD
+
+$env:MSSQL04_CONN = cat /git/secrets/MSSQL04_CONN
+$env:MSSQL04_USER = cat /git/secrets/MSSQL04_USER
+$env:MSSQL04_PASSWORD = cat /git/secrets/MSSQL04_PASSWORD

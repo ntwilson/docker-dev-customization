@@ -4,7 +4,7 @@ RUN npm install -g purescript purescript-language-server pyright && \
     dotnet tool install --global FsAutoComplete
 
 # install neovim
-ENV PATH "$PATH:/opt/nvim-linux64/bin"
+ENV PATH="$PATH:/opt/nvim-linux64/bin"
 RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
     rm -rf /opt/nvim && \
     tar -C /opt -xzf nvim-linux64.tar.gz && \
@@ -14,8 +14,6 @@ RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linu
     /opt/nvim-linux64/bin/nvim --headless +PlugInstall +qall
 
 
-
-    # pwsh -c "Install-Module -Name pwsh-dotenv -Force" && \
 
 RUN git config --global core.editor nvim && \
     git config --global user.name "Nathan Wilson" && \
@@ -36,6 +34,8 @@ RUN pwsh -c "Install-Module -Name posh-git -Scope CurrentUser -Force" && \
     dos2unix /root/Fix-dotenv.ps1 && \
     pwsh -f /root/Fix-dotenv.ps1 && \
     rm /root/Fix-dotenv.ps1
+
+    # pwsh -c "Install-Module -Name pwsh-dotenv -Force" && \
 
 COPY ./Microsoft.PowerShell_profile.ps1 /root/.config/powershell/Microsoft.PowerShell_profile.ps1
 
