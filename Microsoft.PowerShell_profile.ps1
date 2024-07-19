@@ -4,7 +4,7 @@ Import-Module dotenv
 oh-my-posh --init --shell pwsh --config ~/.config/oh-my-posh/ntwilson.omp.json | Invoke-Expression
 
 if (Test-Path .\.env) {
-  set-dotenv
+  import-dotenv
 }
 
 $env:MSSQL03_CONN = cat /git/secrets/MSSQL03_CONN

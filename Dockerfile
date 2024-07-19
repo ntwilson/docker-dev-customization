@@ -30,12 +30,7 @@ COPY ./Fix-dotenv.ps1 /root/Fix-dotenv.ps1
 
 # install posh-git & dotenv
 RUN pwsh -c "Install-Module -Name posh-git -Scope CurrentUser -Force" && \
-    pwsh -c "Install-Module -Name dotenv -Force" && \
-    dos2unix /root/Fix-dotenv.ps1 && \
-    pwsh -f /root/Fix-dotenv.ps1 && \
-    rm /root/Fix-dotenv.ps1
-
-    # pwsh -c "Install-Module -Name pwsh-dotenv -Force" && \
+    pwsh -c "Install-Module -Name pwsh-dotenv -Force"
 
 COPY ./Microsoft.PowerShell_profile.ps1 /root/.config/powershell/Microsoft.PowerShell_profile.ps1
 
