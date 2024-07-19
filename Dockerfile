@@ -26,7 +26,6 @@ RUN curl -s https://ohmyposh.dev/install.sh | bash -s && \
     mkdir -p $HOME/.config/oh-my-posh
 
 COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
-COPY ./Fix-dotenv.ps1 /root/Fix-dotenv.ps1
 
 # install posh-git & dotenv
 RUN pwsh -c "Install-Module -Name posh-git -Scope CurrentUser -Force" && \
