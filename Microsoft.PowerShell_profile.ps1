@@ -1,5 +1,4 @@
 Import-Module posh-git
-Import-Module dotenv
 
 oh-my-posh --init --shell pwsh --config ~/.config/oh-my-posh/ntwilson.omp.json | Invoke-Expression
 
