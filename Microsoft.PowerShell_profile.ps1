@@ -6,10 +6,10 @@ if (Test-Path .\.env) {
   import-dotenv
 }
 
-$env:MSSQL03_CONN = cat /git/secrets/MSSQL03_CONN
-$env:MSSQL03_USER = cat /git/secrets/MSSQL03_USER
-$env:MSSQL03_PASSWORD = cat /git/secrets/MSSQL03_PASSWORD
+$env:MSSQL03_SERVER = cat /secrets/MSSQL03_SERVER
+$env:MSSQL03_USER = cat /secrets/MSSQL03_USER
+$env:MSSQL03_PASSWORD = cat /secrets/MSSQL03_PASSWORD
 
-$env:MSSQL04_CONN = cat /git/secrets/MSSQL04_CONN
-$env:MSSQL04_USER = cat /git/secrets/MSSQL04_USER
-$env:MSSQL04_PASSWORD = cat /git/secrets/MSSQL04_PASSWORD
+$env:MSSQL04_SERVER = cat /secrets/MSSQL04_SERVER
+$env:MSSQL04_USER = cat /secrets/MSSQL04_USER
+$env:MSSQL04_PASSWORD = cat /secrets/MSSQL04_PASSWORD
