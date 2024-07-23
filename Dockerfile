@@ -41,5 +41,5 @@ RUN dos2unix $HOME/.config/powershell/Microsoft.PowerShell_profile.ps1 && \
 
 COPY ./Setup.ps1 /root/Setup.ps1
 
-WORKDIR git
+WORKDIR /git
 
