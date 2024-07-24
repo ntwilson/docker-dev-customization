@@ -41,5 +41,8 @@ RUN dos2unix $HOME/.config/powershell/Microsoft.PowerShell_profile.ps1 && \
 
 COPY ./Setup.ps1 /root/Setup.ps1
 
+ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/git/WebTools/AutomationScripts/PowerShell/Modules"
+
 WORKDIR /git
 
+# RUN find ./customization -type f -print0 | xargs -0 dos2unix -- && \
