@@ -28,8 +28,7 @@ RUN curl -s https://ohmyposh.dev/install.sh | bash -s && \
 COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
 
 # install posh-git & dotenv
-RUN pwsh -c "Install-Module -Name posh-git -Scope CurrentUser -Force" && \
-    pwsh -c "Install-Module -Name pwsh-dotenv -Force"
+RUN pwsh -c "Install-Module -Name posh-git -Scope CurrentUser -Force"
 
 COPY ./Microsoft.PowerShell_profile.ps1 /root/.config/powershell/Microsoft.PowerShell_profile.ps1
 
