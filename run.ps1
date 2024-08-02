@@ -46,8 +46,13 @@ docker run -it `
   --mount "type=bind,src=$home\DockerVolumes\powershell-history,dst=/root/.local/share/powershell/PSReadLine" `
   --mount "type=bind,src=$home\DockerVolumes\az,dst=/root/.azure" `
   --mount "type=bind,src=$home\DockerClipBoard,dst=/clipboard" `
-  --mount "type=bind,src=\\wsl$\Ubuntu\var\run\docker.sock,dst=/var/run/docker.sock" `
   --network host `
   $imageName $startCmd
 
+  
+# Enable this bind mount to use docker commands like `docker build` from inside your docker container
+# and have it share your host machine's docker daemon. You will need to edit it to point to the correct 
+# distro. When running `wsl -l`, whichever distro is the default should be placed in the path
+#
+#  --mount "type=bind,src=\\wsl$\<distro>\var\run\docker.sock,dst=/var/run/docker.sock" `
   
