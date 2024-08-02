@@ -5,7 +5,7 @@ param (
 ) 
 
 if (-not (test-path ~\DockerClipBoard)) { md ~\DockerClipBoard }
-if (-not (test-path ~\DockerVolumes)) { md ~\DockerClipBoard }
+if (-not (test-path ~\DockerVolumes)) { md ~\DockerVolumes }
 
 function Create-Volume {
   param($name, $dst)
