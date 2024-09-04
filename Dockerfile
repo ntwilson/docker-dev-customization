@@ -58,7 +58,7 @@ COPY ./signin.ps1 /root/signin.ps1
 
 RUN dos2unix $HOME/Setup.ps1 && dos2unix $HOME/signin.ps1
 
-ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/git/WebTools/AutomationScripts/PowerShell/Modules"
+ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/workspace/WebTools/AutomationScripts/PowerShell/Modules"
 ENV DOTNET_NEW_PREFERRED_LANG="F#"
 
 WORKDIR /workspace
