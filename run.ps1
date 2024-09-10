@@ -1,8 +1,14 @@
 
 param (
+  [String] $Port,
   [String] $ImageName="ntw", 
   [String] $StartCmd="pwsh"
 ) 
+
+$portArgs = @()
+if ($Port) {
+  $portArgs += "-p", "$($Port):$($Port)"
+}
 
 if (-not (test-path ~\DockerClipBoard)) { md ~\DockerClipBoard }
 if (-not (test-path ~\DockerVolumes)) { md ~\DockerVolumes }
@@ -46,7 +52,7 @@ docker run -it `
   --mount "type=bind,src=$home\DockerVolumes\powershell-history,dst=/root/.local/share/powershell/PSReadLine" `
   --mount "type=bind,src=$home\DockerVolumes\az,dst=/root/.azure" `
   --mount "type=bind,src=$home\DockerClipBoard,dst=/clipboard" `
-  --network host `
+  @portArgs `
   $imageName $startCmd
 
   
