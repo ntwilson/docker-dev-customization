@@ -1,6 +1,8 @@
 FROM mea
 
-RUN apt install less
+RUN apt install \
+    less \
+    azcopy
 
 RUN npm install -g purescript purescript-language-server pyright && \
     dotnet tool install --global FsAutoComplete
