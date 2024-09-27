@@ -15,7 +15,11 @@ RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linu
     apt install ripgrep && \
     /opt/nvim-linux64/bin/nvim --headless +PlugInstall +qall
 
+COPY ./InstallPwshES.ps1 /root/InstallPwshES.ps1
 
+# install PowerShell Neovim setup
+RUN dos2unix /root/InstallPwshES.ps1 && \
+    pwsh /root/InstallPwshES.ps1
 
 RUN git config --global core.editor nvim && \
     git config --global user.name "Nathan Wilson" && \
