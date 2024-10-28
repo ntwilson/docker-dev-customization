@@ -10,3 +10,4 @@ if (Test-Path /secrets/.ntw.env) {
   import-dotenv /secrets/.ntw.env
 }
 
+Import-AzContext "$((Get-AzContextAutosaveSetting).ContextDirectory)/$((Get-AzContextAutosaveSetting).ContextFile)"
