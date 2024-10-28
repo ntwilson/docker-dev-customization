@@ -39,6 +39,7 @@ docker run -it `
   --mount "type=volume,src=nvim,dst=/root/.local/share/nvim" `
   --mount "type=volume,src=powershell-history,dst=/root/.local/share/powershell/PSReadLine" `
   --mount "type=volume,src=az,dst=/root/.azure" `
+  --mount "type=volume,src=azpwsh,dst=/root/.Azure" `
   --mount "type=bind,src=$home\DockerClipBoard,dst=/clipboard" `
   @portArgs `
   $imageName $startCmd
