@@ -40,6 +40,7 @@ docker run -it `
   --mount "type=volume,src=powershell-history,dst=/root/.local/share/powershell/PSReadLine" `
   --mount "type=volume,src=az,dst=/root/.azure" `
   --mount "type=volume,src=az-pwsh,dst=/root/.Azure" `
+  --mount 'type=volume,src=azcache,dst=/root/.local/share/.IdentityService' `
   --mount "type=bind,src=$home\DockerClipBoard,dst=/clipboard" `
   @portArgs `
   $imageName $startCmd
