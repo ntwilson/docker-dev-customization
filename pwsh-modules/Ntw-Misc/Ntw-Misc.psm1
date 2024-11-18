@@ -27,8 +27,11 @@ function Mssql-Cli {
 
 function Fps-For {
   param ([String][Parameter(Mandatory=$True)] $UtilSearchTerm)
+  $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-SERVER -AsPlainText
+  $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-USER -AsPlainText
+  $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
 
-  sqlcmd -U $env:MSSQL04_USER -P $env:MSSQL04_PASSWORD -S $env:MSSQL04_SERVER -d DataScienceMart -i /workspace/fcst-points.sql -W -v util=$UtilSearchTerm
+  sqlcmd -U $user -P $pass -S $Server -d DataScienceMart -i /workspace/fcst-points.sql -W -v util=$UtilSearchTerm
 }
 
 function Sqlcmd-WithAuth {
