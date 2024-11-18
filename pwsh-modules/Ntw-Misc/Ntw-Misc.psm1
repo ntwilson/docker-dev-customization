@@ -31,7 +31,7 @@ function Fps-For {
   $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-USER -AsPlainText
   $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
 
-  sqlcmd -U $user -P $pass -S $Server -d DataScienceMart -i /workspace/fcst-points.sql -W -v util=$UtilSearchTerm
+  sqlcmd -U $user -P $pass -S $Server -d DataScienceMart -i "$PSScriptRoot/fcst-points.sql" -W -v util=$UtilSearchTerm
 }
 
 function Sqlcmd-WithAuth {
