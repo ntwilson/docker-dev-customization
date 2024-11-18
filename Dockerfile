@@ -48,9 +48,11 @@ RUN dos2unix $HOME/.config/powershell/Microsoft.PowerShell_profile.ps1 && \
 
 COPY ./Setup.ps1 /root/Setup.ps1
 COPY ./signin.ps1 /root/signin.ps1
+COPY ./pwsh-modules /root/pwsh-modules
 
 RUN dos2unix $HOME/Setup.ps1 && dos2unix $HOME/signin.ps1
 
 ENV DOTNET_NEW_PREFERRED_LANG="F#"
+ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/root/pwsh-modules:/workspace/WebTools/AutomationScripts/PowerShell/Modules"
 
 WORKDIR /workspace

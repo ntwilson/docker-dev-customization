@@ -1,14 +1,8 @@
 
 param (
-  [String] $Port,
-  [String] $ImageName="ntw", 
-  [String] $StartCmd="pwsh"
+  [String] $WorkDir,
+  [parameter(ValueFromRemainingArguments = $true)][string[]]$Cmd
 ) 
-
-$portArgs = @()
-if ($Port) {
-  $portArgs += "-p", "$($Port):$($Port)"
-}
 
 if (-not (test-path ~\DockerClipBoard)) { mkdir ~\DockerClipBoard }
 # if (-not (test-path ~\DockerVolumes)) { mkdir ~\DockerVolumes }
@@ -23,7 +17,7 @@ if (-not (test-path ~\DockerClipBoard)) { mkdir ~\DockerClipBoard }
 #   }
 # }
 
-docker run -it `
+docker run `
   --rm `
   --mount "type=volume,src=workspace,dst=/workspace" `
   --mount "type=volume,src=secrets,dst=/secrets" `
@@ -45,8 +39,8 @@ docker run -it `
   --mount "type=volume,src=azcache,dst=/root/.local/share/.IdentityService" `
   --mount "type=bind,src=$((get-item ~).FullName)\DockerClipBoard,dst=/clipboard" `
   --mount "type=bind,src=\\wsl$\Ubuntu\var\run\docker.sock,dst=/var/run/docker.sock" `
-  @portArgs `
-  $imageName $startCmd
+  -w $WorkDir `
+  ntw @Cmd
 
   
 # Enable this bind mount to use docker commands like `docker build` from inside your docker container
