@@ -20,12 +20,12 @@ function Mssql-Cli {
     $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
   }
   elseif ($Server -match "azure") {
-    $token = (Get-AzAccessToken -ResourceUrl https://database.windows.net -AsSecureString).Token | ConvertFrom-SecureString -AsPlainText
-    $arguments = @{ ServerInstance = $env:DB_SERVER; Database = $Database; AccessToken = $token; }
+    $connStr = "Server=$env:DB_SERVER; Authentication=Active Directory Default; Database=$Database;"
+    $arguments = @{ ConnectionString = $connStr }
   }
   else {
-    $token = (Get-AzAccessToken -ResourceUrl https://database.windows.net -AsSecureString).Token | ConvertFrom-SecureString -AsPlainText
-    $arguments = @{ ServerInstance = $Server; Database = $Database; AccessToken = $token; }
+    $connStr = "Server=$Server; Authentication=Active Directory Default; Database=$Database;"
+    $arguments = @{ ConnectionString = $connStr }
   }
 
   if ($Query) {
@@ -43,6 +43,110 @@ function Mssql-Cli {
   }
 
   Invoke-SqlCmd @arguments
+}
+
+function Mssql-CliTables {
+  param (
+    [String][Parameter(Mandatory=$True)]$Server,
+    [string][Parameter(Mandatory=$True)]$Database
+  )
+
+  if ($Server -match "mssql03") {
+    $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-SERVER -AsPlainText
+    $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-USER -AsPlainText
+    $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-PASSWORD -AsPlainText
+    $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
+  }
+  elseif ($Server -match "mssql04") {
+    $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-SERVER -AsPlainText
+    $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-USER -AsPlainText
+    $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
+    $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
+  }
+  elseif ($Server -match "azure") {
+    $connStr = "Server=$env:DB_SERVER; Authentication=Active Directory Default; Database=$Database;"
+    $arguments = @{ ConnectionString = $connStr }
+  }
+  else {
+    $connStr = "Server=$Server; Authentication=Active Directory Default; Database=$Database;"
+    $arguments = @{ ConnectionString = $connStr }
+  }
+
+  $arguments.Add("Query", "exec sp_tables")
+
+  Invoke-SqlCmd @arguments | Where-Object { $_.table_owner -match 'dbo' } | ForEach-Object table_name
+}
+
+function Mssql-CliIndexes {
+  param (
+    [String][Parameter(Mandatory=$True)]$Server,
+    [string][Parameter(Mandatory=$True)]$Database,
+    [string]$TableName
+  )
+
+  if ($Server -match "mssql03") {
+    $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-SERVER -AsPlainText
+    $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-USER -AsPlainText
+    $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-PASSWORD -AsPlainText
+    $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
+  }
+  elseif ($Server -match "mssql04") {
+    $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-SERVER -AsPlainText
+    $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-USER -AsPlainText
+    $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
+    $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
+  }
+  elseif ($Server -match "azure") {
+    $connStr = "Server=$env:DB_SERVER; Authentication=Active Directory Default; Database=$Database;"
+    $arguments = @{ ConnectionString = $connStr }
+  }
+  else {
+    $connStr = "Server=$Server; Authentication=Active Directory Default; Database=$Database;"
+    $arguments = @{ ConnectionString = $connStr }
+  }
+
+  $arguments.Add("Query", "exec sp_statistics $TableName")
+
+  Invoke-SqlCmd @arguments | Select-Object -Property index_name,type,column_name,seq_in_index | Format-Table
+}
+
+function Mssql-CliFKs {
+  param (
+    [String][Parameter(Mandatory=$True)]$Server,
+    [string][Parameter(Mandatory=$True)]$Database,
+    [string]$OnTable,
+    [string]$ToTable
+  )
+
+  if ($Server -match "mssql03") {
+    $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-SERVER -AsPlainText
+    $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-USER -AsPlainText
+    $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-PASSWORD -AsPlainText
+    $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
+  }
+  elseif ($Server -match "mssql04") {
+    $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-SERVER -AsPlainText
+    $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-USER -AsPlainText
+    $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
+    $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
+  }
+  elseif ($Server -match "azure") {
+    $connStr = "Server=$env:DB_SERVER; Authentication=Active Directory Default; Database=$Database;"
+    $arguments = @{ ConnectionString = $connStr }
+  }
+  else {
+    $connStr = "Server=$Server; Authentication=Active Directory Default; Database=$Database;"
+    $arguments = @{ ConnectionString = $connStr }
+  }
+  
+  if ($OnTable) {
+    $arguments.Add("Query", "exec sp_fkeys @fktable_name=$OnTable")
+    Invoke-SqlCmd @arguments | Select-Object -Property fk_name,fkcolumn_name,pktable_name,pkcolumn_name,key_seq | Format-Table
+  }
+  else {
+    $arguments.Add("Query", "exec sp_fkeys @pktable_name=$ToTable")
+    Invoke-SqlCmd @arguments | Select-Object -Property fk_name,pkcolumn_name,fktable_name,fkcolumn_name,key_seq | Format-Table
+  }
 }
 
 function Fps-For {
@@ -77,4 +181,8 @@ function Sqlcmd-WithAuth {
   }
 
   sqlcmd $arguments
+}
+
+function beep {
+  [Console]::Beep()
 }
