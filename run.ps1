@@ -11,28 +11,20 @@ if ($Port) {
 }
 
 if (-not (test-path ~\DockerClipBoard)) { mkdir ~\DockerClipBoard }
-# if (-not (test-path ~\DockerVolumes)) { mkdir ~\DockerVolumes }
-
-# function Create-Volume {
-#   param($name, $dst)
-# 
-#   if (-not (test-path ~\DockerVolumes\$name)) {
-#     docker run --rm `
-#       --mount "type=bind,src=$home\DockerVolumes\$name,dst=/temp-volume" `
-#       $ImageName sh -c "cp -r $dst/* /temp-volume"
-#   }
-# }
-
+  
+# shm-size to prevent F# Ionide crashing for large solutions: https://github.com/dotnet/vscode-csharp/issues/7119
+  
 docker run -it `
   --rm `
+  --shm-size=4G `
   --mount "type=volume,src=workspace,dst=/workspace" `
   --mount "type=volume,src=secrets,dst=/secrets" `
   --mount "type=volume,src=gitconfig-volume,dst=/gitconfigvolume" `
-  --mount "type=volume,src=dotnet-cache,dst=/usr/share/dotnet" `
-  --mount "type=volume,src=dotnet,dst=/root/.dotnet" `
   --mount "type=volume,src=gh,dst=/root/.config/gh" `
   --mount "type=volume,src=gh-exts,dst=/root/.local/share/gh" `
   --mount "type=volume,src=copilot,dst=/root/.config/github-copilot" `
+  --mount "type=volume,src=dotnet,dst=/root/.dotnet" `
+  --mount "type=volume,src=dotnet-cache,dst=/usr/share/dotnet" `
   --mount "type=volume,src=paket,dst=/root/.config/Paket" `
   --mount "type=volume,src=nuget-config,dst=/root/.config/NuGet" `
   --mount "type=volume,src=nuget,dst=/root/.nuget" `
@@ -44,7 +36,6 @@ docker run -it `
   --mount "type=volume,src=az-pwsh,dst=/root/.Azure" `
   --mount "type=volume,src=azcache,dst=/root/.local/share/.IdentityService" `
   --mount "type=bind,src=$((get-item ~).FullName)\DockerClipBoard,dst=/clipboard" `
-  --mount "type=bind,src=\\wsl$\Ubuntu\var\run\docker.sock,dst=/var/run/docker.sock" `
   @portArgs `
   $imageName $startCmd
 

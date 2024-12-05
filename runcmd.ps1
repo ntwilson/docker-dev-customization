@@ -5,17 +5,6 @@ param (
 ) 
 
 if (-not (test-path ~\DockerClipBoard)) { mkdir ~\DockerClipBoard }
-# if (-not (test-path ~\DockerVolumes)) { mkdir ~\DockerVolumes }
-
-# function Create-Volume {
-#   param($name, $dst)
-# 
-#   if (-not (test-path ~\DockerVolumes\$name)) {
-#     docker run --rm `
-#       --mount "type=bind,src=$home\DockerVolumes\$name,dst=/temp-volume" `
-#       $ImageName sh -c "cp -r $dst/* /temp-volume"
-#   }
-# }
 
 docker run `
   --rm `
@@ -38,7 +27,6 @@ docker run `
   --mount "type=volume,src=az-pwsh,dst=/root/.Azure" `
   --mount "type=volume,src=azcache,dst=/root/.local/share/.IdentityService" `
   --mount "type=bind,src=$((get-item ~).FullName)\DockerClipBoard,dst=/clipboard" `
-  --mount "type=bind,src=\\wsl$\Ubuntu\var\run\docker.sock,dst=/var/run/docker.sock" `
   -w $WorkDir `
   ntw @Cmd
 
