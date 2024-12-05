@@ -42,6 +42,8 @@ function Mssql-Cli {
     $arguments.Add("Variable", $Variable)
   }
 
+  $arguments.Add("Verbose", $true)
+
   Invoke-SqlCmd @arguments
 }
 
@@ -73,6 +75,7 @@ function Mssql-CliTables {
   }
 
   $arguments.Add("Query", "exec sp_tables")
+  $arguments.Add("Verbose", $true)
 
   Invoke-SqlCmd @arguments | Where-Object { $_.table_owner -match 'dbo' } | ForEach-Object table_name
 }
@@ -106,6 +109,7 @@ function Mssql-CliIndexes {
   }
 
   $arguments.Add("Query", "exec sp_statistics $TableName")
+  $arguments.Add("Verbose", $true)
 
   Invoke-SqlCmd @arguments | Select-Object -Property index_name,type,column_name,seq_in_index | Format-Table
 }
@@ -139,6 +143,8 @@ function Mssql-CliFKs {
     $arguments = @{ ConnectionString = $connStr }
   }
   
+  $arguments.Add("Verbose", $true)
+
   if ($OnTable) {
     $arguments.Add("Query", "exec sp_fkeys @fktable_name=$OnTable")
     Invoke-SqlCmd @arguments | Select-Object -Property fk_name,fkcolumn_name,pktable_name,pkcolumn_name,key_seq | Format-Table
