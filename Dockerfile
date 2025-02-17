@@ -8,14 +8,14 @@ RUN npm install -g purescript purescript-language-server pyright && \
     dotnet tool install --global FsAutoComplete
 
 # install neovim
-ENV PATH="$PATH:/opt/nvim-linux64/bin"
-RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux64.tar.gz && \
+ENV PATH="$PATH:/opt/nvim-linux-x86_64/bin"
+RUN curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz && \
     rm -rf /opt/nvim && \
-    tar -C /opt -xzf nvim-linux64.tar.gz && \
-    rm nvim-linux64.tar.gz && \
+    tar -C /opt -xzf nvim-linux-x86_64.tar.gz && \
+    rm nvim-linux-x86_64.tar.gz && \
     git clone https://github.com/ntwilson/neovim-config.git $HOME/.config/nvim && \
     apt install ripgrep && \
-    /opt/nvim-linux64/bin/nvim --headless +PlugInstall +qall
+    /opt/nvim-linux-x86_64/bin/nvim --headless +PlugInstall +qall
 
 COPY ./InstallPwshES.ps1 /root/InstallPwshES.ps1
 
