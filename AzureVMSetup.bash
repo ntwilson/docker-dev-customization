@@ -29,6 +29,7 @@ docker tag "meacontainers.azurecr.io/dev-env-ntw:latest" dev-env-ntw
 
 mkdir ~/DockerClipBoard
 
+cat > run.bash <<EOF 
 docker run -it \
   --rm \
   --mount "type=volume,src=workspace,dst=/workspace" \
@@ -44,7 +45,12 @@ docker run -it \
   --mount "type=volume,src=powershell-history,dst=/root/.local/share/powershell/PSReadLine" \
   --mount "type=volume,src=az,dst=/root/.azure" \
   --mount "type=volume,src=az-pwsh,dst=/root/.Azure" \
-  --mount 'type=volume,src=azcache,dst=/root/.local/share/.IdentityService' \
-  --mount "type=bind,src=$HOME/DockerClipBoard,dst=/clipboard" \
+  --mount "type=volume,src=azcache,dst=/root/.local/share/.IdentityService" \
+  --mount "type=bind,src=\$HOME/DockerClipBoard,dst=/clipboard" \
+  -p "1080:1080" \
+  --cap-add NET_ADMIN \
+  --sysctl net.ipv6.conf.all.disable_ipv6=0 \
+  --sysctl net.ipv4.conf.all.src_valid_mark=1 \
   dev-env-ntw pwsh
+EOF
 

@@ -4,6 +4,12 @@ RUN apt install \
     less \
     azcopy
 
+# install ncdu
+RUN curl -LO https://dev.yorhel.nl/download/ncdu-2.7-linux-x86_64.tar.gz && \
+    tar -C /opt -xzf ncdu-2.7-linux-x86_64.tar.gz && \
+    rm ncdu-2.7-linux-x86_64.tar.gz
+    
+
 RUN npm install -g purescript purescript-language-server pyright && \
     dotnet tool install --global FsAutoComplete
 
