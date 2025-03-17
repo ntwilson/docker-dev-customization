@@ -9,3 +9,11 @@ if (Test-Path /secrets/.env) {
 if (Test-Path /secrets/.ntw.env) {
   import-dotenv /secrets/.ntw.env
 }
+
+$global:BillingCycleDataPath = "/workspace/BillingCycleData"
+$global:DataScienceETLPath = "/workspace/DataScienceETL"
+$global:HourlyModelTrainingPath = "/workspace/hourly-model-training"
+$global:DailyModelTrainingPath = "/workspace/DailyModelTraining"
+$global:GasDayFrameworkPath = "/workspace/GasDayFramework"
+$global:WebPlatformPath = "/workspace/WebPlatform"
+$global:WebDatabasePopulatorPath = "/workspace/WebDatabasePopulator"
