@@ -3,3 +3,10 @@ xontrib load coconut
 $PROMPT = '\n {INTENSE_GREEN}{user}  {INTENSE_BLUE}{cwd}  {INTENSE_GREEN}{env_name}  {RESET}{gitstatus}\n {RESET}🐚 {INTENSE_GREEN}❯ '
 $RIGHT_PROMPT = '{INTENSE_RED}{last_return_code_if_nonzero}'
 
+$DB_SERVER_ADDRESS = 'gk4rq4yarx.database.windows.net'
+$DB_SERVER_NAME = 'gk4rq4yarx'
+
+$DB_RESOURCE_GROUP = 'ProductionDatabases'
+$DB_ELASTIC_POOL = 'GasDayElasticPool'
+
+$DAILY_MODEL_RUN_LOCAL_PATH = "/workspace/DailyModelTraining"
