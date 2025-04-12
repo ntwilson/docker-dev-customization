@@ -1,4 +1,4 @@
-FROM mea
+FROM personal-base
 
 RUN apt install \
     less \
@@ -52,11 +52,16 @@ RUN dos2unix $HOME/.config/powershell/Microsoft.PowerShell_profile.ps1 && \
     cat $HOME/tempbashrc >> $HOME/.bashrc && \
     rm $HOME/tempbashrc
 
+# install xonsh with coconut
+RUN pipx install xonsh && \
+    pipx inject xonsh coconut
+
 COPY ./Setup.ps1 /root/Setup.ps1
 COPY ./signin.ps1 /root/signin.ps1
 COPY ./pwsh-modules /root/pwsh-modules
+COPY ./.xonshrc /root/.xonshrc
 
-RUN dos2unix $HOME/Setup.ps1 && dos2unix $HOME/signin.ps1
+RUN dos2unix $HOME/Setup.ps1 && dos2unix $HOME/signin.ps1 && dos2unix $HOME/.xonshrc
 
 ENV DOTNET_NEW_PREFERRED_LANG="F#"
 ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/root/pwsh-modules:/workspace/WebTools/AutomationScripts/PowerShell/Modules"
