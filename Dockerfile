@@ -1,4 +1,4 @@
-FROM personal-base
+FROM mea
 
 RUN apt install \
     less \
