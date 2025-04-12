@@ -54,7 +54,8 @@ RUN dos2unix $HOME/.config/powershell/Microsoft.PowerShell_profile.ps1 && \
 
 # install xonsh with coconut
 RUN pipx install xonsh && \
-    pipx inject xonsh coconut
+    pipx inject xonsh coconut && \
+    pipx inject xonsh pyodbc
 
 COPY ./Setup.ps1 /root/Setup.ps1
 COPY ./signin.ps1 /root/signin.ps1
