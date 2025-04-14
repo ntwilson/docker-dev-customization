@@ -21,6 +21,7 @@ from azure import identity
 from azure.keyvault.secrets import SecretClient
 from tabulate import tabulate
 import re
+import json
 
 def get_secret(vault_name: str, key_name: str) -> str:
     # as of 2022-07-29, visual studio code credentials are broken https://github.com/Azure/azure-sdk-for-python/issues/23249
@@ -98,7 +99,7 @@ def snd(tup):
   return y
 
 def get_prod_dbs():
-  server = get_secret("MeaMCast", "DB-SERVER")
+  server = $DB_SERVER_ADDRESS
   dbs = mssql(server=server, database="master", query="select name from sys.databases")
 
   dbsToExclude = ['Demo_old', 'JobDatabase', 'master']
@@ -107,6 +108,6 @@ def get_prod_dbs():
   return [ db for db in [db.name for db in dbs] if not db.startswith('QA_') and not db in dbsToExclude and not re.search(exclude_pattern, db) ]
 
 def get_qa_dbs():
-  server = get_secret("MeaMCast", "DB-SERVER")
+  server = $DB_SERVER_ADDRESS
   dbs = mssql(server=server, database="master", query="select name from sys.databases where name like 'QA_%'")
   return [db.name for db in dbs]
