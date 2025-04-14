@@ -2,6 +2,9 @@ xontrib load coconut
 
 $PROMPT = '\n  {INTENSE_GREEN}{user}   {INTENSE_BLUE} {cwd}   {INTENSE_GREEN} {env_name}   {RESET} {gitstatus}\n {RESET}🐚 {INTENSE_GREEN}❯ '
 $RIGHT_PROMPT = '{INTENSE_RED}{last_return_code_if_nonzero}'
+$CASE_SENSITIVE_COMPLETIONS = False
+$COMPLETIONS_CONFIRM = False
+$XONSH_HISTORY_MATCH_ANYWHERE = True
 
 $DB_SERVER_ADDRESS = 'gk4rq4yarx.database.windows.net'
 $DB_SERVER_NAME = 'gk4rq4yarx'
@@ -11,4 +14,85 @@ $DB_ELASTIC_POOL = 'GasDayElasticPool'
 
 $DAILY_MODEL_RUN_LOCAL_PATH = "/workspace/DailyModelTraining"
 
+import pyodbc
+from urllib import parse
+import struct
+from azure import identity
+from azure.keyvault.secrets import SecretClient
+from tabulate import tabulate
+
+def get_secret(vault_name: str, key_name: str) -> str:
+    # as of 2022-07-29, visual studio code credentials are broken https://github.com/Azure/azure-sdk-for-python/issues/23249
+    credential = identity.DefaultAzureCredential(
+        exclude_shared_token_cache_credential=True, exclude_visual_studio_code_credential=True, process_timeout=30
+    )
+    key_vault_uri = f"https://{vault_name}.vault.azure.net"
+    client = SecretClient(vault_url=key_vault_uri, credential=credential)
+    retrieved_secret = client.get_secret(key_name)
+    if retrieved_secret.value is None:
+        raise ValueError(f"Secret {key_name} not found in vault {vault_name}")
+    return retrieved_secret.value
+
+def get_conn(server, database):
+  driver = "{ODBC Driver 17 for SQL Server}"
+  if "mssql04" in server:
+    username = get_secret("MeaOnPrem", "MSSQL04-USER")
+    password = get_secret("MeaOnPrem", "MSSQL04-PASSWORD")
+    mssql04address = get_secret("MeaOnPrem", "MSSQL04-SERVER")
+    conn_str = (
+        f"Driver={driver};Server=tcp:{mssql04address},1433;Database={database};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;UID={username};PWD={password}"
+    )
+    return pyodbc.connect(conn_str)
+  elif "mssql03" in server:
+    username = get_secret("MeaOnPrem", "MSSQL03-USER")
+    password = get_secret("MeaOnPrem", "MSSQL03-PASSWORD")
+    mssql03address = get_secret("MeaOnPrem", "MSSQL03-SERVER")
+    conn_str = (
+        f"Driver={driver};Server=tcp:{mssql03address},1433;Database={database};Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;UID={username};PWD={password}"
+    )
+    return pyodbc.connect(conn_str)
+  else:
+    # https://learn.microsoft.com/en-us/azure/azure-sql/database/azure-sql-python-quickstart?view=azuresql&tabs=windows%2Csql-inter#add-code-to-connect-to-azure-sql-database
+
+    conn_str = (
+        f"Driver={driver};Server=tcp:{server},1433;Database={database};Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+    )
+
+    credential = identity.DefaultAzureCredential(exclude_interactive_browser_credential=False)
+    token_bytes = credential.get_token("https://database.windows.net/.default").token.encode("UTF-16-LE")
+    token_struct = struct.pack(f"<I{len(token_bytes)}s", len(token_bytes), token_bytes)
+    SQL_COPT_SS_ACCESS_TOKEN = 1256  # This connection option is defined by microsoft in msodbcsql.h
+    return pyodbc.connect(conn_str, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
+
+def mssql(server=$DB_SERVER_ADDRESS, *, database, query=None, input_script=None, variables=None): 
+  with get_conn(server, database) as conn:
+    cursor = conn.cursor()
+
+    if query is not None:
+      cursor.execute(query)
+      return cursor.fetchall()
+
+    if input_script is not None:
+      contents = $(cat input_script)
+      
+      if variables is not None: 
+        for (variable_name, variable_value) in variables.items():
+          contents = contents.replace(f'$({variable_name})', f'{variable_value}')
+      
+      cursor.execute(contents)
+      return cursor.fetchall()
+    
+def mapTuple(tup, l=None, r=None):
+  (x, y) = tup
+  newX = x if l is None else l(x)
+  newY = y if r is None else r(y)
+  return (newX, newY)
+
+def fst(tup):
+  (x, y) = tup
+  return x
+
+def snd(tup):
+  (x, y) = tup
+  return y
 

@@ -39,10 +39,20 @@ RUN git config --global core.editor nvim && \
 RUN curl -s https://ohmyposh.dev/install.sh | bash -s && \
     mkdir -p $HOME/.config/oh-my-posh
 
-COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
-
 # install posh-git & dotenv
 RUN pwsh -c "Install-Module -Name posh-git -Scope CurrentUser -Force"
+
+# install xonsh with coconut
+RUN pipx install xonsh && \
+    pipx inject xonsh coconut
+
+# install extra global dependencies to use from xonsh
+RUN pipx inject xonsh pyodbc && \
+    pipx inject xonsh azure-identity && \
+    pipx inject xonsh azure-keyvault && \
+    pipx inject xonsh tabulate
+
+COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
 
 COPY ./Microsoft.PowerShell_profile.ps1 /root/.config/powershell/Microsoft.PowerShell_profile.ps1
 
@@ -52,17 +62,14 @@ RUN dos2unix $HOME/.config/powershell/Microsoft.PowerShell_profile.ps1 && \
     cat $HOME/tempbashrc >> $HOME/.bashrc && \
     rm $HOME/tempbashrc
 
-# install xonsh with coconut
-RUN pipx install xonsh && \
-    pipx inject xonsh coconut && \
-    pipx inject xonsh pyodbc
-
 COPY ./Setup.ps1 /root/Setup.ps1
 COPY ./signin.ps1 /root/signin.ps1
 COPY ./pwsh-modules /root/pwsh-modules
 COPY ./.xonshrc /root/.xonshrc
 
-RUN dos2unix $HOME/Setup.ps1 && dos2unix $HOME/signin.ps1 && dos2unix $HOME/.xonshrc
+RUN dos2unix $HOME/Setup.ps1 && \
+    dos2unix $HOME/signin.ps1 && \
+    dos2unix $HOME/.xonshrc
 
 ENV DOTNET_NEW_PREFERRED_LANG="F#"
 ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/root/pwsh-modules:/workspace/WebTools/AutomationScripts/PowerShell/Modules"
