@@ -83,6 +83,29 @@ def mssql(server=$DB_SERVER_ADDRESS, *, database, query=None, input_script=None,
       
       cursor.execute(contents)
       return cursor.fetchall()
+
+def onprem(server='mssql04.ad.mea.energy', database='DataScienceMart', query=None, input_script=None, variables=None): 
+  server_address = get_secret("MeaOnPrem", "MSSQL04-SERVER" if 'mssql04' in server else "MSSQL03-SERVER")
+  user = get_secret("MeaOnPrem", "MSSQL04-USER" if 'mssql04' in server else "MSSQL03-USER")
+  pwd = get_secret("MeaOnPrem", "MSSQL04-PASSWORD" if 'mssql04' in server else "MSSQL03-PASSWORD")
+
+  query_args = ['-Q', query] if query is not None else []
+  
+
+  if input_script is not None:
+    if variables is not None:
+      args = [ f"{var_name}={var_value}" for (var_name, var_value) in variables.items() ]
+      variable_args = [ '-v' ] + args
+    else:
+      variable_args = []
+    
+    input_script_args = ['-i', input_script] + variable_args
+  else:
+    input_script_args = []
+
+  return ['-U', user, '-P', pwd, '-S', server_address] + input_script_args + query_args
+    
+
     
 def mapTuple(tup, l=None, r=None):
   (x, y) = tup
@@ -111,3 +134,11 @@ def get_qa_dbs():
   server = $DB_SERVER_ADDRESS
   dbs = mssql(server=server, database="master", query="select name from sys.databases where name like 'QA_%'")
   return [db.name for db in dbs]
+
+def print_all(strs):
+  for s in strs:
+    print(s)
+
+def lines(path):
+  return $(cat @(path)).split('\n')
+
