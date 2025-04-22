@@ -139,6 +139,9 @@ def print_all(strs):
   for s in strs:
     print(s)
 
+def table(lst):
+  print(tabulate(lst))
+
 def lines(path):
   return $(cat @(path)).split('\n')
 
