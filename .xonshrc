@@ -13,6 +13,9 @@ $DB_RESOURCE_GROUP = 'ProductionDatabases'
 $DB_ELASTIC_POOL = 'GasDayElasticPool'
 
 $DAILY_MODEL_RUN_LOCAL_PATH = "/workspace/DailyModelTraining"
+$BASH_COMPLETIONS.append('~/git-completion.bash')
+
+source-bash ~/git-completion.bash
 
 import pyodbc
 from urllib import parse
@@ -66,7 +69,7 @@ def get_conn(server, database):
     SQL_COPT_SS_ACCESS_TOKEN = 1256  # This connection option is defined by microsoft in msodbcsql.h
     return pyodbc.connect(conn_str, attrs_before={SQL_COPT_SS_ACCESS_TOKEN: token_struct})
 
-def mssql(server=$DB_SERVER_ADDRESS, *, database, query=None, input_script=None, variables=None): 
+def mssql(server=$DB_SERVER_ADDRESS, *, database, query=None, cmd=None, query_script=None, cmd_script=None, variables=None): 
   with get_conn(server, database) as conn:
     cursor = conn.cursor()
 
@@ -74,15 +77,35 @@ def mssql(server=$DB_SERVER_ADDRESS, *, database, query=None, input_script=None,
       cursor.execute(query)
       return cursor.fetchall()
 
-    if input_script is not None:
-      contents = $(cat input_script)
+    if cmd is not None:
+      cursor.execute(cmd)
+      return
+
+    if query_script is not None:
+      contents = $(cat query_script)
+    if cmd_script is not None:
+      contents = $(cat cmd_script)
       
-      if variables is not None: 
-        for (variable_name, variable_value) in variables.items():
-          contents = contents.replace(f'$({variable_name})', f'{variable_value}')
+    if variables is not None: 
+      for (variable_name, variable_value) in variables.items():
+        contents = contents.replace(f'$({variable_name})', f'{variable_value}')
       
-      cursor.execute(contents)
+    cursor.execute(contents)
+    if query_script is not None:
       return cursor.fetchall()
+    else:
+      return
+
+def columns(query_results):
+  return query_results[0].cursor_description
+
+def mssql_description(server=$DB_SERVER_ADDRESS, *, database, query): 
+  return columns(mssql(server, database=database, query=query))
+
+def mssql_tables(server=$DB_SERVER_ADDRESS, *, database): 
+  tables = mssql(server, database=database, query="exec sp_tables")
+  return [ table for table in tables if re.search('dbo', table.TABLE_OWNER) ]
+
 
 def onprem(server='mssql04.ad.mea.energy', database='DataScienceMart', query=None, input_script=None, variables=None): 
   server_address = get_secret("MeaOnPrem", "MSSQL04-SERVER" if 'mssql04' in server else "MSSQL03-SERVER")
@@ -142,6 +165,20 @@ def print_all(strs):
 def table(lst):
   print(tabulate(lst))
 
-def lines(path):
-  return $(cat @(path)).split('\n')
+def split_into_lines(string):
+  xs = string.split('\n')
+  if xs[-1]:
+    return xs
+  else:
+    return xs[:-1]
+
+def lines(string):
+  if '\n' in string:
+    return split_into_lines(string)
+  else: 
+    return split_into_lines($(cat @(string)))
+
+def and_print(x):
+  print(x)
+  return x
 

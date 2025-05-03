@@ -56,8 +56,10 @@ COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
 
 COPY ./Microsoft.PowerShell_profile.ps1 /root/.config/powershell/Microsoft.PowerShell_profile.ps1
 
+COPY ./git-completion.bash /root/git-completion.bash
 COPY ./.bashrc /root/tempbashrc
 RUN dos2unix $HOME/.config/powershell/Microsoft.PowerShell_profile.ps1 && \
+    dos2unix $HOME/git-completion.bash && \
     dos2unix $HOME/tempbashrc && \
     cat $HOME/tempbashrc >> $HOME/.bashrc && \
     rm $HOME/tempbashrc
@@ -70,6 +72,8 @@ COPY ./.xonshrc /root/.xonshrc
 RUN dos2unix $HOME/Setup.ps1 && \
     dos2unix $HOME/signin.ps1 && \
     dos2unix $HOME/.xonshrc
+
+RUN echo "set bell-style none" >> $HOME/.inputrc
 
 ENV DOTNET_NEW_PREFERRED_LANG="F#"
 ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/root/pwsh-modules:/workspace/WebTools/AutomationScripts/PowerShell/Modules"
