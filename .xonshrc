@@ -5,6 +5,13 @@ $RIGHT_PROMPT = '{INTENSE_RED}{last_return_code_if_nonzero}'
 $CASE_SENSITIVE_COMPLETIONS = False
 $COMPLETIONS_CONFIRM = False
 $XONSH_HISTORY_MATCH_ANYWHERE = True
+$XONSH_SUBPROC_OUTPUT_FORMAT = 'list_lines'
+$ANSICON = '🐚 Xonsh'
+$INTENSIFY_COLORS_ON_WIN = True
+$AUTO_PUSHD = True
+$MANPAGER = "less -X"
+$LESS = "--ignore-case --quit-if-one-screen --quit-on-intr FRXQ"
+$XONSH_SHOW_TRACEBACK = False
 
 $DB_SERVER_ADDRESS = 'gk4rq4yarx.database.windows.net'
 $DB_SERVER_NAME = 'gk4rq4yarx'
@@ -12,11 +19,13 @@ $DB_SERVER_NAME = 'gk4rq4yarx'
 $DB_RESOURCE_GROUP = 'ProductionDatabases'
 $DB_ELASTIC_POOL = 'GasDayElasticPool'
 
+
 $DAILY_MODEL_RUN_LOCAL_PATH = "/workspace/DailyModelTraining"
 $BASH_COMPLETIONS.append('~/git-completion.bash')
 
 source-bash ~/git-completion.bash
 
+X = __xonsh__
 import pyodbc
 from urllib import parse
 import struct
@@ -25,6 +34,22 @@ from azure.keyvault.secrets import SecretClient
 from tabulate import tabulate
 import re
 import json
+import yaml
+from shutil import which as _which
+
+if _which('curl'):
+  aliases['myip'] = 'curl @($args) -s https://ifconfig.co/json' + (' | jq' if _which('jq') else '')
+
+
+# JSON to YAML
+@aliases.register("j2y")
+def __j2y(args, stdin, stdout):
+    print(yaml.dump(json.loads(stdin.read())), file=stdout)
+
+# YAML to JSON
+@aliases.register("y2j")
+def __y2j(args, stdin, stdout):
+    json.dump(yaml.safe_load(stdin), stdout, indent=4)
 
 def get_secret(vault_name: str, key_name: str) -> str:
     # as of 2022-07-29, visual studio code credentials are broken https://github.com/Azure/azure-sdk-for-python/issues/23249
@@ -107,29 +132,6 @@ def mssql_tables(server=$DB_SERVER_ADDRESS, *, database):
   return [ table for table in tables if re.search('dbo', table.TABLE_OWNER) ]
 
 
-def onprem(server='mssql04.ad.mea.energy', database='DataScienceMart', query=None, input_script=None, variables=None): 
-  server_address = get_secret("MeaOnPrem", "MSSQL04-SERVER" if 'mssql04' in server else "MSSQL03-SERVER")
-  user = get_secret("MeaOnPrem", "MSSQL04-USER" if 'mssql04' in server else "MSSQL03-USER")
-  pwd = get_secret("MeaOnPrem", "MSSQL04-PASSWORD" if 'mssql04' in server else "MSSQL03-PASSWORD")
-
-  query_args = ['-Q', query] if query is not None else []
-  
-
-  if input_script is not None:
-    if variables is not None:
-      args = [ f"{var_name}={var_value}" for (var_name, var_value) in variables.items() ]
-      variable_args = [ '-v' ] + args
-    else:
-      variable_args = []
-    
-    input_script_args = ['-i', input_script] + variable_args
-  else:
-    input_script_args = []
-
-  return ['-U', user, '-P', pwd, '-S', server_address] + input_script_args + query_args
-    
-
-    
 def mapTuple(tup, l=None, r=None):
   (x, y) = tup
   newX = x if l is None else l(x)
@@ -177,6 +179,9 @@ def lines(string):
     return split_into_lines(string)
   else: 
     return split_into_lines($(cat @(string)))
+
+def unlines(strings):
+  return "\n".join(strings)
 
 def and_print(x):
   print(x)

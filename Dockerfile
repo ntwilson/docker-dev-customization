@@ -50,7 +50,8 @@ RUN pipx install xonsh && \
 RUN pipx inject xonsh pyodbc && \
     pipx inject xonsh azure-identity && \
     pipx inject xonsh azure-keyvault && \
-    pipx inject xonsh tabulate
+    pipx inject xonsh tabulate && \
+    pipx inject xonsh pyyaml
 
 COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
 
