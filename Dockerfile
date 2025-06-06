@@ -1,8 +1,10 @@
 FROM mea
 
-RUN apt install \
+RUN apt update && \
+    apt install \
     less \
-    azcopy
+    azcopy \
+    time
 
 # install ncdu
 RUN curl -LO https://dev.yorhel.nl/download/ncdu-2.7-linux-x86_64.tar.gz && \

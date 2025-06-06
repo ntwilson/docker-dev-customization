@@ -5,7 +5,7 @@ $RIGHT_PROMPT = '{INTENSE_RED}{last_return_code_if_nonzero}'
 $CASE_SENSITIVE_COMPLETIONS = False
 $COMPLETIONS_CONFIRM = False
 $XONSH_HISTORY_MATCH_ANYWHERE = True
-$XONSH_SUBPROC_OUTPUT_FORMAT = 'list_lines'
+$XONSH_SUBPROC_OUTPUT_FORMAT = 'stream_lines'
 $ANSICON = '🐚 Xonsh'
 $INTENSIFY_COLORS_ON_WIN = True
 $AUTO_PUSHD = True
@@ -35,10 +35,13 @@ from tabulate import tabulate
 import re
 import json
 import yaml
+import time
 from shutil import which as _which
 
 if _which('curl'):
   aliases['myip'] = 'curl @($args) -s https://ifconfig.co/json' + (' | jq' if _which('jq') else '')
+
+aliases['timef'] = 'time -f %E @($args)'
 
 
 # JSON to YAML
@@ -107,9 +110,9 @@ def mssql(server=$DB_SERVER_ADDRESS, *, database, query=None, cmd=None, query_sc
       return
 
     if query_script is not None:
-      contents = $(cat query_script)
+      contents = $(cat @(query_script))
     if cmd_script is not None:
-      contents = $(cat cmd_script)
+      contents = $(cat @(cmd_script))
       
     if variables is not None: 
       for (variable_name, variable_value) in variables.items():
@@ -187,3 +190,10 @@ def and_print(x):
   print(x)
   return x
 
+def timep(fn):
+  start = time.time()
+  result = fn()
+  end = time.time()
+  print("Elapsed time: {:.6f} seconds".format(end - start))
+  return result
+  
