@@ -2,7 +2,7 @@
 param (
   [String] $Port,
   [String] $ImageName="ntw", 
-  [String] $StartCmd="pwsh"
+  [String] $StartCmd="xonsh"
 ) 
 
 $portArgs = @()
@@ -32,6 +32,7 @@ docker run -it `
   --mount "type=volume,src=pdm,dst=/root/.local/share/pdm" `
   --mount "type=volume,src=nvim,dst=/root/.local/share/nvim" `
   --mount "type=volume,src=powershell-history,dst=/root/.local/share/powershell/PSReadLine" `
+  --mount "type=volume,src=xonsh-history,dst=/root/.local/share/xonsh/history_json/" `
   --mount "type=volume,src=az,dst=/root/.azure" `
   --mount "type=volume,src=az-pwsh,dst=/root/.Azure" `
   --mount "type=volume,src=azcache,dst=/root/.local/share/.IdentityService" `
