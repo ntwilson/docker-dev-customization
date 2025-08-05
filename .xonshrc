@@ -20,10 +20,16 @@ $DB_RESOURCE_GROUP = 'ProductionDatabases'
 $DB_ELASTIC_POOL = 'GasDayElasticPool'
 
 
-$DAILY_MODEL_RUN_LOCAL_PATH = "/workspace/DailyModelTraining"
+# $DAILY_MODEL_RUN_LOCAL_PATH = "/workspace/DailyModelTraining"
 $BASH_COMPLETIONS.append('~/git-completion.bash')
 
-source-bash ~/git-completion.bash
+  
+if $OS == "Windows_NT":
+    git_bin_path = r"C:\Program Files\Git\usr\bin" # Adjust path if Git is installed elsewhere
+    if git_bin_path not in $PATH:
+        $PATH.append(git_bin_path)
+else:
+    source-bash ~\git-completion.bash
 
 X = __xonsh__
 import pyodbc
@@ -37,6 +43,10 @@ import json
 import yaml
 import time
 from shutil import which as _which
+from pathlib import Path
+import itertools
+import os
+import subprocess
 
 if _which('curl'):
   aliases['myip'] = 'curl @($args) -s https://ifconfig.co/json' + (' | jq' if _which('jq') else '')
@@ -196,4 +206,37 @@ def timep(fn):
   end = time.time()
   print("Elapsed time: {:.6f} seconds".format(end - start))
   return result
-  
+ 
+@aliases.register
+def _ii(args):
+  for file in args:
+    if $OS == "Windows_NT":
+      os.startfile(file)
+    elif $OS == "darwin":  # macOS
+      subprocess.run(["open", filepath])
+    else:  # Linux and other Unix-like systems
+      subprocess.run(["xdg-open", filepath])
+
+def ii(file):
+  if isinstance(file, list):
+    _ii(file)
+  else:
+    _ii([file])
+
+def searchrec(file_pat, excl_pat, grep_pat):
+  for file in (file for file in Path(".").rglob(file_pat)):
+    file_name = str(file.absolute)
+    if not any([pat in file_name for pat in excl_pat]):
+      output = $(grep @(grep_pat) @(file))
+      if output:
+        print(f"{file}:")
+        print(output)
+
+def writelines(file, lines):
+  with open(file, 'w') as f:
+    f.writelines([f'{line}\n' for line in lines])
+
+def appendlines(file, lines):
+  with open(file, 'a') as f:
+    f.writelines([f'{line}\n' for line in lines])
+
