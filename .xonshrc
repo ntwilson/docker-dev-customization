@@ -23,13 +23,6 @@ $DB_ELASTIC_POOL = 'GasDayElasticPool'
 # $DAILY_MODEL_RUN_LOCAL_PATH = "/workspace/DailyModelTraining"
 $BASH_COMPLETIONS.append('~/git-completion.bash')
 
-  
-if $OS == "Windows_NT":
-    git_bin_path = r"C:\Program Files\Git\usr\bin" # Adjust path if Git is installed elsewhere
-    if git_bin_path not in $PATH:
-        $PATH.append(git_bin_path)
-else:
-    source-bash ~\git-completion.bash
 
 X = __xonsh__
 import pyodbc
@@ -47,6 +40,16 @@ from pathlib import Path
 import itertools
 import os
 import subprocess
+from zipfile import ZipFile
+  
+if 'OS' in os.environ and $OS == "Windows_NT":
+    git_bin_path = r"C:\Program Files\Git\usr\bin" # Adjust path if Git is installed elsewhere
+    if git_bin_path not in $PATH:
+        $PATH.append(git_bin_path)
+
+    aliases['bashfind'] = r'\Program Files\Git\usr\bin\find.exe @($args)'
+else:
+    source-bash ~/git-completion.bash
 
 if _which('curl'):
   aliases['myip'] = 'curl @($args) -s https://ifconfig.co/json' + (' | jq' if _which('jq') else '')
@@ -210,9 +213,9 @@ def timep(fn):
 @aliases.register
 def _ii(args):
   for file in args:
-    if $OS == "Windows_NT":
+    if 'OS' in os.environ and $OS == "Windows_NT":
       os.startfile(file)
-    elif $OS == "darwin":  # macOS
+    elif 'OS' in os.environ and $OS == "darwin":  # macOS
       subprocess.run(["open", filepath])
     else:  # Linux and other Unix-like systems
       subprocess.run(["xdg-open", filepath])
@@ -240,3 +243,8 @@ def appendlines(file, lines):
   with open(file, 'a') as f:
     f.writelines([f'{line}\n' for line in lines])
 
+def unzip(file):
+  filename_wo_extension = os.path.splitext(os.path.basename(file))[0]
+  os.makedirs(filename_wo_extension, exist_ok=True)
+  with ZipFile(file, 'r') as zip_obj:
+    zip_obj.extractall(path=filename_wo_extension)
