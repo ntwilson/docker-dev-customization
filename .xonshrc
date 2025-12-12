@@ -50,6 +50,7 @@ if 'OS' in os.environ and $OS == "Windows_NT":
     aliases['bashfind'] = r'\Program Files\Git\usr\bin\find.exe @($args)'
 else:
     source-bash ~/git-completion.bash
+    source-bash ~/.cargo/env
 
 if _which('curl'):
   aliases['myip'] = 'curl @($args) -s https://ifconfig.co/json' + (' | jq' if _which('jq') else '')
