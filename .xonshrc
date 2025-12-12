@@ -1,5 +1,3 @@
-xontrib load coconut
-
 $PROMPT = '\n  {INTENSE_GREEN}{user}   {INTENSE_BLUE} {cwd}   {INTENSE_GREEN} {env_name}   {RESET} {gitstatus}\n {RESET}🐚 {INTENSE_GREEN}❯ '
 $RIGHT_PROMPT = '{INTENSE_RED}{last_return_code_if_nonzero}'
 $CASE_SENSITIVE_COMPLETIONS = False
@@ -42,6 +40,7 @@ import os
 import subprocess
 from zipfile import ZipFile
   
+
 if 'OS' in os.environ and $OS == "Windows_NT":
     git_bin_path = r"C:\Program Files\Git\usr\bin" # Adjust path if Git is installed elsewhere
     if git_bin_path not in $PATH:
@@ -50,7 +49,8 @@ if 'OS' in os.environ and $OS == "Windows_NT":
     aliases['bashfind'] = r'\Program Files\Git\usr\bin\find.exe @($args)'
 else:
     source-bash ~/git-completion.bash
-    source-bash ~/.cargo/env
+    if Path.home().joinpath(".cargo", "env").exists():
+      source-bash ~/.cargo/env
 
 if _which('curl'):
   aliases['myip'] = 'curl @($args) -s https://ifconfig.co/json' + (' | jq' if _which('jq') else '')
