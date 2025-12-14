@@ -72,10 +72,14 @@ COPY ./Setup.ps1 /root/Setup.ps1
 COPY ./signin.ps1 /root/signin.ps1
 COPY ./pwsh-modules /root/pwsh-modules
 COPY ./.xonshrc /root/.xonshrc
+COPY ./code.sh /usr/local/bin/code
 
 RUN dos2unix $HOME/Setup.ps1 && \
     dos2unix $HOME/signin.ps1 && \
-    dos2unix $HOME/.xonshrc
+    dos2unix $HOME/.xonshrc && \
+    dos2unix /usr/local/bin/code && \
+    chmod +x /usr/local/bin/code
+
 
 RUN echo "set bell-style none" >> $HOME/.inputrc
 
