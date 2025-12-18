@@ -40,7 +40,7 @@ $watcherJob = Start-Job -ScriptBlock {
         $containerHex = ($bytes | ForEach-Object { $_.ToString("x2") }) -join ''
               
         # Launch VS Code
-        Start-Process "code" -ArgumentList "--folder-uri", "vscode-remote://attached-container+${containerHex}${workDir}"
+        code --folder-uri "vscode-remote://attached-container+${containerHex}${workDir}"
               
         # Delete the request file
         Start-Sleep -Milliseconds 500
