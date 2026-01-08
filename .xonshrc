@@ -139,14 +139,14 @@ def mssql(server=$DB_SERVER_ADDRESS, *, database, query=None, cmd=None, query_sc
       return
 
 def columns(query_results):
-  return query_results[0].cursor_description
+  return [tup[0] for tup in query_results[0].cursor_description]
 
 def mssql_description(server=$DB_SERVER_ADDRESS, *, database, query): 
   return columns(mssql(server, database=database, query=query))
 
 def mssql_tables(server=$DB_SERVER_ADDRESS, *, database): 
   tables = mssql(server, database=database, query="exec sp_tables")
-  return [ table for table in tables if re.search('dbo', table.TABLE_OWNER) ]
+  return [ table.TABLE_NAME for table in tables if re.search('dbo', table.TABLE_OWNER) ]
 
 
 def mapTuple(tup, l=None, r=None):

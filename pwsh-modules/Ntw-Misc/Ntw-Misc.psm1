@@ -1,7 +1,7 @@
 function Mssql-Cli {
   param (
-    [String][Parameter(Mandatory=$True)]$Server,
     [string][Parameter(Mandatory=$True)]$Database,
+    [String]$Server=$env:DB_SERVER_ADDRESS,
     [string]$Query,
     [string]$InputScript,
     [string]$Variable
@@ -18,7 +18,7 @@ function Mssql-Cli {
     $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
     $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
   } elseif ($Server -match "azure") {
-    $connStr = "Server=$env:DB_SERVER; Authentication=Active Directory Default; Database=$Database;"
+    $connStr = "Server=$env:DB_SERVER_ADDRESS; Authentication=Active Directory Default; Database=$Database;"
     $arguments = @{ ConnectionString = $connStr }
   } else {
     $connStr = "Server=$Server; Authentication=Active Directory Default; Database=$Database;"
@@ -44,8 +44,8 @@ function Mssql-Cli {
 
 function Mssql-CliTables {
   param (
-    [String][Parameter(Mandatory=$True)]$Server,
-    [string][Parameter(Mandatory=$True)]$Database
+    [string][Parameter(Mandatory=$True)]$Database,
+    [String]$Server=$env:DB_SERVER_ADDRESS
   )
 
   if ($Server -match "mssql03") {
@@ -59,7 +59,7 @@ function Mssql-CliTables {
     $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
     $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
   } elseif ($Server -match "azure") {
-    $connStr = "Server=$env:DB_SERVER; Authentication=Active Directory Default; Database=$Database;"
+    $connStr = "Server=$env:DB_SERVER_ADDRESS; Authentication=Active Directory Default; Database=$Database;"
     $arguments = @{ ConnectionString = $connStr }
   } else {
     $connStr = "Server=$Server; Authentication=Active Directory Default; Database=$Database;"
@@ -74,8 +74,8 @@ function Mssql-CliTables {
 
 function Mssql-CliIndexes {
   param (
-    [String][Parameter(Mandatory=$True)]$Server,
     [string][Parameter(Mandatory=$True)]$Database,
+    [String]$Server=$env:DB_SERVER_ADDRESS,
     [string]$TableName
   )
 
@@ -90,7 +90,7 @@ function Mssql-CliIndexes {
     $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
     $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
   } elseif ($Server -match "azure") {
-    $connStr = "Server=$env:DB_SERVER; Authentication=Active Directory Default; Database=$Database;"
+    $connStr = "Server=$env:DB_SERVER_ADDRESS; Authentication=Active Directory Default; Database=$Database;"
     $arguments = @{ ConnectionString = $connStr }
   } else {
     $connStr = "Server=$Server; Authentication=Active Directory Default; Database=$Database;"
@@ -105,8 +105,8 @@ function Mssql-CliIndexes {
 
 function Mssql-CliFKs {
   param (
-    [String][Parameter(Mandatory=$True)]$Server,
     [string][Parameter(Mandatory=$True)]$Database,
+    [String]$Server=$env:DB_SERVER_ADDRESS,
     [string]$OnTable,
     [string]$ToTable
   )
@@ -122,7 +122,7 @@ function Mssql-CliFKs {
     $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
     $arguments = @{ ServerInstance = $Server; Username = $user; Password = $pass; Database = $Database; TrustServerCertificate = $true }
   } elseif ($Server -match "azure") {
-    $connStr = "Server=$env:DB_SERVER; Authentication=Active Directory Default; Database=$Database;"
+    $connStr = "Server=$env:DB_SERVER_ADDRESS; Authentication=Active Directory Default; Database=$Database;"
     $arguments = @{ ConnectionString = $connStr }
   } else {
     $connStr = "Server=$Server; Authentication=Active Directory Default; Database=$Database;"
@@ -142,18 +142,14 @@ function Mssql-CliFKs {
 
 function Fps-For {
   param ([String][Parameter(Mandatory=$True)] $UtilSearchTerm)
-  $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-SERVER -AsPlainText
-  $user = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-USER -AsPlainText
-  $pass = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL04-PASSWORD -AsPlainText
-
-  $results = sqlcmd -U $user -P $pass -S $Server -d DataScienceMart -i "$PSScriptRoot/fcst-points.sql" -W -s ',' -v util=$UtilSearchTerm
+  $results = sqlcmd -S $env:DB_SERVER_ADDRESS -d Hub -G -i "$PSScriptRoot/fcst-points.sql" -W -s ',' -v util=$UtilSearchTerm
 
   $parsed = @($results | Select-Object -First 1) + @($results | Select-Object -Skip 2)
   $parsed | ConvertFrom-Csv | Format-Table
 }
 
 function Sqlcmd-WithAuth {
-  param ([String][Parameter(Mandatory=$True)]$Server, [parameter(ValueFromRemainingArguments = $true)][string[]]$Passthrough)
+  param ([String]$Server=$env:DB_SERVER_ADDRESS, [parameter(ValueFromRemainingArguments = $true)][string[]]$Passthrough)
 
   if ($Server -match "mssql03") {
     $Server = Get-azKeyVaultSecret -VaultName MeaOnPrem -Name MSSQL03-SERVER -AsPlainText

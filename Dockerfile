@@ -83,6 +83,7 @@ RUN dos2unix $HOME/Setup.ps1 && \
 
 RUN echo "set bell-style none" >> $HOME/.inputrc
 
+# ENV DAILY_MODEL_RUN_LOCAL_PATH="/workspace/DailyModelTraining"
 ENV DOTNET_NEW_PREFERRED_LANG="F#"
 ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/root/pwsh-modules:/workspace/WebTools/AutomationScripts/PowerShell/Modules"
 
