@@ -56,6 +56,9 @@ RUN pipx inject xonsh pyodbc && \
     pipx inject xonsh tabulate && \
     pipx inject xonsh pyyaml
 
+# install claude code
+RUN curl -fsSL https://claude.ai/install.sh | bash
+
 COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
 
 COPY ./Microsoft.PowerShell_profile.ps1 /root/.config/powershell/Microsoft.PowerShell_profile.ps1

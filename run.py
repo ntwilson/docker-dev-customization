@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -36,6 +37,25 @@ def main():
     # Ensure DockerClipBoard directory exists
     docker_clipboard_dir = Path.home() / "DockerClipBoard"
     docker_clipboard_dir.mkdir(exist_ok=True)
+
+    # Set up authentication paths
+    home = Path.home()
+    if sys.platform == "win32":
+        # Windows paths
+        azure_path = home / ".azure"
+        az_cache_path = Path(os.environ.get("LOCALAPPDATA", "")) / ".IdentityService"
+        claude_settings_path = home / ".claude"
+        claude_json_path = home / ".claude.json"
+    else:
+        # Linux/macOS paths
+        azure_path = home / ".azure"
+        az_cache_path = home / ".local" / "share" / ".IdentityService"
+        claude_settings_path = home / ".claude"
+        claude_json_path = home / ".claude.json"
+
+    # Create directories if they don't exist
+    for auth_dir in [azure_path, az_cache_path, claude_settings_path]:
+        auth_dir.mkdir(parents=True, exist_ok=True)
 
     # Build docker command
     docker_cmd = [
@@ -78,11 +98,15 @@ def main():
         "--mount",
         "type=volume,src=xonsh-history,dst=/root/.local/share/xonsh/history_json/",
         "--mount",
-        "type=volume,src=az,dst=/root/.azure",
-        "--mount",
         "type=volume,src=az-pwsh,dst=/root/.Azure",
         "--mount",
-        "type=volume,src=azcache,dst=/root/.local/share/.IdentityService",
+        f"type=bind,src={azure_path},dst=/root/.azure",
+        "--mount",
+        f"type=bind,src={az_cache_path},dst=/root/.local/share/.IdentityService",
+        "--mount",
+        f"type=bind,src={claude_settings_path},dst=/root/.claude",
+        "--mount",
+        f"type=bind,src={claude_json_path},dst=/root/.claude.json",
         "--mount",
         f"type=bind,src={docker_clipboard_dir},dst=/clipboard",
     ]
