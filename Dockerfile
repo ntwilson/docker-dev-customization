@@ -59,6 +59,9 @@ RUN pipx inject xonsh pyodbc && \
 # install claude code
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
+# install codex
+RUN npm i -g @openai/codex
+
 COPY ./ntwilson.omp.json /root/.config/oh-my-posh/ntwilson.omp.json
 
 COPY ./Microsoft.PowerShell_profile.ps1 /root/.config/powershell/Microsoft.PowerShell_profile.ps1
