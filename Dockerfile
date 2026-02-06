@@ -63,6 +63,10 @@ ARG CACHEBUST=1
 # install claude code
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
+RUN mkdir /claudejsonvolume && \
+    mv /root/.claude.json /claudejsonvolume/.claude.json && \
+    ln -s /claudejsonvolume/.claude.json /root/.claude.json
+
 # install codex
 RUN npm i -g @openai/codex
 

@@ -44,21 +44,13 @@ def main():
         # Windows paths
         azure_path = home / ".azure"
         az_cache_path = Path(os.environ.get("LOCALAPPDATA", "")) / ".IdentityService"
-        claude_credentials_path = home / ".claude" / ".credentials.json"
-        claude_settings_path = home / ".claude" / "config.json"
-        claude_json_path = home / ".claude.json"
-        codex_path = home / ".codex"
     else:
         # Linux/macOS paths
         azure_path = home / ".azure"
         az_cache_path = home / ".local" / "share" / ".IdentityService"
-        claude_credentials_path = home / ".claude" / ".credentials.json"
-        claude_settings_path = home / ".claude" / "config.json"
-        claude_json_path = home / ".claude.json"
-        codex_path = home / ".codex"
 
     # Create directories if they don't exist
-    for auth_dir in [azure_path, az_cache_path, claude_settings_path.parent, claude_credentials_path.parent]:
+    for auth_dir in [azure_path, az_cache_path]:
         auth_dir.mkdir(parents=True, exist_ok=True)
 
     # Build docker command
@@ -108,13 +100,11 @@ def main():
         "--mount",
         f"type=bind,src={az_cache_path},dst=/root/.local/share/.IdentityService",
         "--mount",
-        f"type=bind,src={claude_settings_path},dst=/root/.claude/config.json",
+        "type=volume,src=claude,dst=/root/.claude",
         "--mount",
-        f"type=bind,src={claude_credentials_path},dst=/root/.claude/.credentials.json",
+        "type=volume,src=claude-json,dst=/root/.claude.json",
         "--mount",
-        f"type=bind,src={claude_json_path},dst=/root/.claude.json",
-        "--mount",
-        f"type=bind,src={codex_path},dst=/root/.codex",
+        "type=volume,src=codex,dst=/root/.codex",
         "--mount",
         f"type=bind,src={docker_clipboard_dir},dst=/clipboard",
     ]

@@ -13,23 +13,6 @@ if ($Port) {
 $WatchPath = New-TemporaryFile | ForEach-Object { Remove-Item $_; New-Item -ItemType Directory -Path $_.FullName }
 if (-not (test-path ~\DockerClipBoard)) { mkdir ~\DockerClipBoard }
 
-# Detect OS and set authentication paths
-$IsWindowsOS = $IsWindows -or ($PSVersionTable.PSVersion.Major -le 5)
-
-if ($IsWindowsOS) {
-  # Windows paths
-  $claudeCredentialsPath = "$env:USERPROFILE\.claude\.credentials.json"
-  $claudeSettingsPath = "$env:USERPROFILE\.claude\config.json"
-  $claudeJsonPath = "$env:USERPROFILE\.claude.json"
-  $codexPath = "$env:USERPROFILE\.codex"
-} else {
-  # Linux/macOS paths
-  $claudeCredentialsPath = "$home/.claude/.credentials.json"
-  $claudeSettingsPath = "$home/.claude/config.json"
-  $claudeJsonPath = "$home/.claude.json"
-  $codexPath = "$home/.codex"
-}
-
 
 # Start file watcher in a background job so it doesn't interfere with the interactive Docker session
 $watcherJob = Start-Job -ScriptBlock {
@@ -114,10 +97,9 @@ try {
     --mount "type=volume,src=personal-az,dst=/root/.azure" `
     --mount "type=volume,src=personal-az-pwsh,dst=/root/.Azure" `
     --mount "type=volume,src=personal-azcache,dst=/root/.local/share/.IdentityService" `
-    --mount "type=bind,src=$claudeSettingsPath,dst=/root/.claude/config.json" `
-    --mount "type=bind,src=$claudeCredentialsPath,dst=/root/.claude/.credentials.json" `
-    --mount "type=bind,src=$claudeJsonPath,dst=/root/.claude.json" `
-    --mount "type=bind,src=$codexPath,dst=/root/.codex" `
+    --mount "type=volume,src=claude,dst=/root/.claude" `
+    --mount "type=volume,src=claude-json,dst=/root/.claude.json" `
+    --mount "type=volume,src=personal-codex,dst=/root/.codex" `
     --mount "type=bind,src=$((get-item ~).FullName)\DockerClipBoard,dst=/clipboard" `
     --mount "type=bind,src=$($WatchPath.FullName),dst=/vscode-requests" `
     @portArgs `

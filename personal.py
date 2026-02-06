@@ -37,17 +37,6 @@ def main():
     docker_clipboard_dir = Path.home() / "DockerClipBoard"
     docker_clipboard_dir.mkdir(exist_ok=True)
 
-    # Set up authentication paths
-    home = Path.home()
-    claude_credentials_path = home / ".claude" / ".credentials.json"
-    claude_settings_path = home / ".claude" / "config.json"
-    claude_json_path = home / ".claude.json"
-    codex_path = home / ".codex"
-
-    # Create directories if they don't exist
-    for auth_dir in [claude_settings_path, claude_credentials_path]:
-        auth_dir.parent.mkdir(parents=True, exist_ok=True)
-
     # Build docker command
     docker_cmd = [
         "docker",
@@ -92,13 +81,11 @@ def main():
         "--mount",
         "type=volume,src=personal-azcache,dst=/root/.local/share/.IdentityService",
         "--mount",
-        f"type=bind,src={claude_settings_path},dst=/root/.claude/config.json",
+        "type=volume,src=claude,dst=/root/.claude",
         "--mount",
-        f"type=bind,src={claude_credentials_path},dst=/root/.claude/.credentials.json",
+        "type=volume,src=claude-json,dst=/root/.claude.json",
         "--mount",
-        f"type=bind,src={claude_json_path},dst=/root/.claude.json",
-        "--mount",
-        f"type=bind,src={codex_path},dst=/root/.codex",
+        "type=volume,src=personal-codex,dst=/root/.codex",
         "--mount",
         f"type=bind,src={docker_clipboard_dir},dst=/clipboard",
     ]
