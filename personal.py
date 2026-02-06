@@ -39,18 +39,14 @@ def main():
 
     # Set up authentication paths
     home = Path.home()
-    if sys.platform == "win32":
-        # Windows paths
-        claude_settings_path = home / ".claude"
-        claude_json_path = home / ".claude.json"
-    else:
-        # Linux/macOS paths
-        claude_settings_path = home / ".claude"
-        claude_json_path = home / ".claude.json"
+    claude_credentials_path = home / ".claude" / ".credentials.json"
+    claude_settings_path = home / ".claude" / "config.json"
+    claude_json_path = home / ".claude.json"
+    codex_path = home / ".codex"
 
     # Create directories if they don't exist
-    for auth_dir in [claude_settings_path]:
-        auth_dir.mkdir(parents=True, exist_ok=True)
+    for auth_dir in [claude_settings_path, claude_credentials_path]:
+        auth_dir.parent.mkdir(parents=True, exist_ok=True)
 
     # Build docker command
     docker_cmd = [
@@ -96,9 +92,13 @@ def main():
         "--mount",
         "type=volume,src=personal-azcache,dst=/root/.local/share/.IdentityService",
         "--mount",
-        f"type=bind,src={claude_settings_path},dst=/root/.claude",
+        f"type=bind,src={claude_settings_path},dst=/root/.claude/config.json",
+        "--mount",
+        f"type=bind,src={claude_credentials_path},dst=/root/.claude/.credentials.json",
         "--mount",
         f"type=bind,src={claude_json_path},dst=/root/.claude.json",
+        "--mount",
+        f"type=bind,src={codex_path},dst=/root/.codex",
         "--mount",
         f"type=bind,src={docker_clipboard_dir},dst=/clipboard",
     ]

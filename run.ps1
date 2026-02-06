@@ -20,20 +20,22 @@ if ($IsWindowsOS) {
   # Windows paths
   $azurePath = "$env:USERPROFILE\.azure"
   $azCachePath = "$env:LOCALAPPDATA\.IdentityService"
-  $claudeSettingsPath = "$env:USERPROFILE\.claude"
+  $claudeCredentialsPath = "$env:USERPROFILE\.claude\.credentials.json"
+  $claudeSettingsPath = "$env:USERPROFILE\.claude\config.json"
   $claudeJsonPath = "$env:USERPROFILE\.claude.json"
   $codexPath = "$env:USERPROFILE\.codex"
 } else {
   # Linux/macOS paths
   $azurePath = "$home/.azure"
   $azCachePath = "$home/.local/share/.IdentityService"
-  $claudeSettingsPath = "$home/.claude"
+  $claudeCredentialsPath = "$home/.claude/.credentials.json"
+  $claudeSettingsPath = "$home/.claude/config.json"
   $claudeJsonPath = "$home/.claude.json"
   $codexPath = "$home/.codex"
 }
 
 # Create directories if they don't exist
-$authDirs = @($azurePath, $azCachePath, $claudeSettingsPath)
+$authDirs = @($azurePath, $azCachePath)
 foreach ($dir in $authDirs) {
   if (-not (Test-Path $dir)) {
     New-Item -ItemType Directory -Path $dir -Force | Out-Null
@@ -127,7 +129,8 @@ try {
     --mount "type=volume,src=az-pwsh,dst=/root/.Azure" `
     --mount "type=bind,src=$azurePath,dst=/root/.azure" `
     --mount "type=bind,src=$azCachePath,dst=/root/.local/share/.IdentityService" `
-    --mount "type=bind,src=$claudeSettingsPath,dst=/root/.claude" `
+    --mount "type=bind,src=$claudeSettingsPath,dst=/root/.claude/config.json" `
+    --mount "type=bind,src=$claudeCredentialsPath,dst=/root/.claude/.credentials.json" `
     --mount "type=bind,src=$claudeJsonPath,dst=/root/.claude.json" `
     --mount "type=bind,src=$codexPath,dst=/root/.codex" `
     --mount "type=bind,src=$((get-item ~).FullName)\DockerClipBoard,dst=/clipboard" `

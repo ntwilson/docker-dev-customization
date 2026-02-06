@@ -1,3 +1,4 @@
+# `docker build --build-arg BASE_IMAGE=personal-base personal .` to build the personal dev environment instead of the work environment
 ARG BASE_IMAGE=dev-env:latest
 FROM ${BASE_IMAGE}
 
@@ -56,6 +57,9 @@ RUN pipx inject xonsh pyodbc && \
     pipx inject xonsh tabulate && \
     pipx inject xonsh pyyaml
 
+# `docker build --build-arg CACHEBUST=$(date +%s) ntw .` to install the newest AI tools without invalidating the whole cache
+ARG CACHEBUST=1
+
 # install claude code
 RUN curl -fsSL https://claude.ai/install.sh | bash
 
@@ -91,6 +95,7 @@ RUN echo "set bell-style none" >> $HOME/.inputrc
 
 # ENV DAILY_MODEL_RUN_LOCAL_PATH="/workspace/DailyModelTraining"
 ENV DOTNET_NEW_PREFERRED_LANG="F#"
+ENV ENABLE_LSP_TOOL=1
 ENV PSModulePath="/root/.local/share/powershell/Modules:/usr/local/share/powershell/Modules:/opt/microsoft/powershell/7/Modules:/root/pwsh-modules:/workspace/WebTools/AutomationScripts/PowerShell/Modules"
 
 WORKDIR /workspace

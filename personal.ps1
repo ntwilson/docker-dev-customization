@@ -18,20 +18,16 @@ $IsWindowsOS = $IsWindows -or ($PSVersionTable.PSVersion.Major -le 5)
 
 if ($IsWindowsOS) {
   # Windows paths
-  $claudeSettingsPath = "$env:USERPROFILE\.claude"
+  $claudeCredentialsPath = "$env:USERPROFILE\.claude\.credentials.json"
+  $claudeSettingsPath = "$env:USERPROFILE\.claude\config.json"
   $claudeJsonPath = "$env:USERPROFILE\.claude.json"
+  $codexPath = "$env:USERPROFILE\.codex"
 } else {
   # Linux/macOS paths
-  $claudeSettingsPath = "$home/.claude"
+  $claudeCredentialsPath = "$home/.claude/.credentials.json"
+  $claudeSettingsPath = "$home/.claude/config.json"
   $claudeJsonPath = "$home/.claude.json"
-}
-
-# Create directories if they don't exist
-$authDirs = @($claudeSettingsPath)
-foreach ($dir in $authDirs) {
-  if (-not (Test-Path $dir)) {
-    New-Item -ItemType Directory -Path $dir -Force | Out-Null
-  }
+  $codexPath = "$home/.codex"
 }
 
 
@@ -118,8 +114,10 @@ try {
     --mount "type=volume,src=personal-az,dst=/root/.azure" `
     --mount "type=volume,src=personal-az-pwsh,dst=/root/.Azure" `
     --mount "type=volume,src=personal-azcache,dst=/root/.local/share/.IdentityService" `
-    --mount "type=bind,src=$claudeSettingsPath,dst=/root/.claude" `
+    --mount "type=bind,src=$claudeSettingsPath,dst=/root/.claude/config.json" `
+    --mount "type=bind,src=$claudeCredentialsPath,dst=/root/.claude/.credentials.json" `
     --mount "type=bind,src=$claudeJsonPath,dst=/root/.claude.json" `
+    --mount "type=bind,src=$codexPath,dst=/root/.codex" `
     --mount "type=bind,src=$((get-item ~).FullName)\DockerClipBoard,dst=/clipboard" `
     --mount "type=bind,src=$($WatchPath.FullName),dst=/vscode-requests" `
     @portArgs `
